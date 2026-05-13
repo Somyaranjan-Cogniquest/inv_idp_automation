@@ -19,14 +19,17 @@ BREADCRUMB_HOME = "nav[aria-label='breadcrumb'] li a"
 SIDEBAR_HOME_ICON = "li[title='Home']"
 
 # Table Header
-MODEL_TABLE_HEADER = "th:has-text('Model Name')"
-MODEL_NAME_HEADER = "//th[contains(text(),'Model Name')]"
+MODEL_TABLE_HEADER = "tr:has(th:has-text('Model Name'))"
+MODEL_NAME_HEADER = "th:has-text('Model Name')"
 MODEL_ID_HEADER = "th:has-text('Model ID')"
+MODEL_TABLE_HEADER_ROW = "tr:has(th:has-text('Model Name'))"
+
 
 # Table Rows
-TABLE_ROWS = "tr.hover:bg"
+TABLE_ROWS = "tr:has(td.Datarow12v5)"
 MODEL_NAME_CELL = "td.Datarow12v5"
 MODEL_ID_CELL = "td.Datarow122v5"
+CREATE_MODEL_BUTTON = "button:has-text('Create Model')"
 
 # Status Icons
 TRAINED_STATUS_ICON = "svg[title='Trained']"
@@ -34,3 +37,8 @@ NOT_TRAINED_STATUS_ICON = "svg[title='Not Trained']"
 
 # Action Menu
 ACTION_MENU_BUTTON = "img[src*='menu-horizontal']"
+# action menu icon appears per row (many), so always use first row in page methods
+ACTION_MENU_ICON = "img[src*='menu-horizontal']"
+
+# sorting headers (click by text)
+HEADER_BY_TEXT = "th:has-text('{col}')"

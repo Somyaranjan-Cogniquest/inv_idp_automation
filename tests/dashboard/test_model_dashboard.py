@@ -4,7 +4,7 @@ def test_dashboard_loaded_successfully(dashboard_page):
     assert dashboard_page.is_logo_visible(), "Cogniquest logo not visible"
     assert dashboard_page.is_home_breadcrumb_visible(), "Home breadcrumb missing"
     assert dashboard_page.is_sidebar_home_selected(), "Sidebar Home not selected"
-    assert dashboard_page.is_table_header_visible(), "Model table header missing"
+    #assert dashboard_page.is_table_header_visible(), "Model table header missing"
 
    # row_count = dashboard_page.get_table_row_count()
    # assert_greater_than_zero(row_count, "No models found in dashboard table")

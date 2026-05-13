@@ -13,14 +13,9 @@ class BasePage:
         return self.page.locator(locator).text_content()
 
     def is_visible(self, locator, timeout=5000):
+        loc = self.page.locator(locator)
         try:
-            self.page.locator(locator).wait_for(
-                state="visible",
-                timeout=timeout
-            )
+            loc.first.wait_for(state="visible", timeout=timeout)
             return True
-
-        except Exception as e:
-            print(f"Element not visible: {locator}")
-            print(f"Error: {e}")
+        except Exception:
             return False

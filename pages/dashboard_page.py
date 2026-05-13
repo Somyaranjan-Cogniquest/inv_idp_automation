@@ -4,43 +4,59 @@ from locators import dashboard_locators as loc
 
 class DashboardPage(BasePage):
 
-    def is_logo_visible(self):
-        return self.is_visible(loc.COGNIQUEST_LOGO)
+    def is_dashboard_loaded(self):
 
-    def is_home_breadcrumb_visible(self):
-        breadcrumb = self.page.locator(loc.BREADCRUMB_CONTAINER)
-        return breadcrumb.is_visible() and "Home" in breadcrumb.inner_text()
-
-    def is_sidebar_home_selected(self):
-        return self.is_visible(loc.SIDEBAR_HOME_ICON)
-
-    def is_table_header_visible(self):
-
-        self.page.wait_for_load_state("networkidle")
-
-        self.page.wait_for_timeout(8000)
-
-        return self.is_visible(loc.MODEL_TABLE_HEADER)
+        return self.page.locator(loc.MODEL_TABLE_HEADER).count() > 0
 
     def get_table_row_count(self):
+
         return self.page.locator(loc.TABLE_ROWS).count()
-
-    def click_first_model_name(self):
-        self.page.locator(loc.MODEL_NAME_CELL).first.click()
-
-    def is_trained_status_present(self):
-        return (
-            self.is_visible(loc.TRAINED_STATUS_ICON)
-            or self.is_visible(loc.NOT_TRAINED_STATUS_ICON)
-        )
-
-    def is_action_menu_present(self):
-        return self.is_visible(loc.ACTION_MENU_BUTTON)
 
     def open_model_by_name(self, model_name: str):
 
-        model_locator = self.page.locator(
+        self.page.locator(
             f"{loc.MODEL_NAME_CELL}:has-text('{model_name}')"
-        )
+        ).first.click()
 
-        model_locator.first.click()
+    # --- Methods required by test_model_dashboard_extended.py ---
+
+    def is_create_model_button_visible(self):
+
+        return self.page.locator(loc.CREATE_MODEL_BUTTON).count() > 0
+
+    def is_trained_count_visible(self):
+
+        return self.page.locator(
+            "th:has-text('Trained Count')"
+        ).count() > 0
+
+    def is_action_menu_present(self):
+
+        # multiple exist -> check first
+        return self.page.locator(
+            loc.ACTION_MENU_ICON
+        ).first.is_visible()
+
+    def click_refresh_on_first_model(self):
+
+        # open the first action menu icon (if refresh exists in dropdown)
+        self.page.locator(
+            loc.ACTION_MENU_ICON
+        ).first.click()
+
+        # Adjust these labels based on actual menu
+        for label in ["Refresh", "refresh", "Reload", "reload"]:
+
+            item = self.page.locator(f"text={label}")
+
+            if item.count() > 0:
+
+                item.first.click()
+
+                return
+
+    def sort_by_column(self, col_name: str):
+
+        self.page.locator(
+            f"th:has-text('{col_name}')"
+        ).first.click()

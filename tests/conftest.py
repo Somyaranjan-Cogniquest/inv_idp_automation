@@ -1,80 +1,157 @@
-import sys
 import os
+import sys
 import pytest
+from playwright.sync_api import sync_playwright
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from utils.config_reader import Config
-from core.playwright_manager import PlaywrightManager
 from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from pages.model_landing_page import ModelLandingPage
-from locators import dashboard_locators as dloc
-from locators import login_locators as lloc
 from pages.processing_dashboard_page import ProcessingDashboardPage
+from pages.create_model_page import CreateModelPage
+from locators import dashboard_locators as dloc
 
+DEFAULT_MODEL_NAME = os.getenv("MODEL_NAME", "TAAS")
 
 
 @pytest.fixture(scope="session")
-def browser_context():
-    """
-    Launch browser once per test session and reuse the same context.
-    """
-    manager = PlaywrightManager()
-    playwright, browser, context, page = manager.start_browser()
+def pw():
 
-    yield manager, playwright, browser, context
+    p = sync_playwright().start()
 
-    manager.stop_browser(playwright, browser)
+    yield p
+
+    p.stop()
 
 
-@pytest.fixture
-def page(browser_context):
-    """
-    Fresh page per test.
-    Always navigates to URL and ensures login.
-    """
-    manager, playwright, browser, context = browser_context
+@pytest.fixture(scope="session")
+def browser(pw):
+
+    browser = pw.chromium.launch(headless=False)
+
+    yield browser
+
+    browser.close()
+
+
+@pytest.fixture(scope="session")
+def storage_state(browser, tmp_path_factory):
+    """Login once and save storage state."""
+
+    state_file = tmp_path_factory.mktemp("state") / "storage.json"
+
+    context = browser.new_context()
+
     page = context.new_page()
+
     page.goto(Config.BASE_URL)
 
-    if page.locator(lloc.EMAIL_INPUT).count() > 0:
-        lp = LoginPage(page)
-        lp.login(Config.USERNAME, Config.PASSWORD)
-    page.locator(dloc.MODEL_TABLE_HEADER).wait_for(state="visible", timeout=30000)
+    lp = LoginPage(page)
 
-    yield page
-    page.close()
+    lp.login(Config.USERNAME, Config.PASSWORD)
+
+    # wait for dashboard to confirm login (using FIXED locator)
+    page.locator(dloc.MODEL_TABLE_HEADER).wait_for(
+        state="visible",
+        timeout=30000
+    )
+
+    context.storage_state(path=str(state_file))
+
+    context.close()
+
+    return str(state_file)
+
 
 @pytest.fixture
-def login_page(page):
-    return LoginPage(page)
+def page(browser, storage_state):
+    """Logged-in page for most tests."""
+
+    context = browser.new_context(storage_state=storage_state)
+
+    page = context.new_page()
+
+    page.goto(Config.BASE_URL)
+
+    # ensure dashboard ready
+    page.locator(dloc.MODEL_TABLE_HEADER).wait_for(
+        state="visible",
+        timeout=30000
+    )
+
+    yield page
+
+    context.close()
+
+
+@pytest.fixture
+def unauth_page(browser):
+    """Unauthenticated page for login negative tests."""
+
+    context = browser.new_context()
+
+    page = context.new_page()
+
+    page.goto(Config.BASE_URL)
+
+    yield page
+
+    context.close()
+
+
+# ---------- Page object fixtures ----------
+
+@pytest.fixture
+def login_page_no_auth(unauth_page):
+
+    return LoginPage(unauth_page)
 
 
 @pytest.fixture
 def dashboard_page(page):
+
     return DashboardPage(page)
+
 
 @pytest.fixture
 def model_landing_page(page):
+
     return ModelLandingPage(page)
 
-@pytest.fixture
-def processing_dashboard_page(page):
-    return ProcessingDashboardPage(page)
 
 @pytest.fixture
-def login_page_no_auth():
-    manager = PlaywrightManager()
-    playwright, browser, context, page = manager.start_browser()
+def processing_page(page):
+    """Navigate from dashboard -> model -> processing dashboard."""
 
-    page.goto(Config.BASE_URL)
+    dp = DashboardPage(page)
 
-    login_page = LoginPage(page)
+    dp.open_model_by_name(DEFAULT_MODEL_NAME)
 
-    yield login_page
+    mp = ModelLandingPage(page)
 
-    manager.stop_browser(playwright, browser)
+    mp.open_processing_dashboard()
 
+    page.wait_for_load_state("networkidle")
+
+    yield page
+
+
+@pytest.fixture
+def processing_dashboard_page(processing_page):
+
+    return ProcessingDashboardPage(processing_page)
+
+
+@pytest.fixture
+def create_model_page(page, dashboard_page):
+
+    cmp = CreateModelPage(page)
+
+    cmp.ensure_open(dashboard_page=dashboard_page)
+
+    return cmp
