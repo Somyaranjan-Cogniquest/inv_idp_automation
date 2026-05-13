@@ -4,7 +4,7 @@ class BasePage:
         self.page = page
 
     def click(self, locator):
-        self.page.locator(locator).click()
+        self.page.locator(locator).first.click()
 
     def fill(self, locator, value):
         self.page.locator(locator).fill(value)
