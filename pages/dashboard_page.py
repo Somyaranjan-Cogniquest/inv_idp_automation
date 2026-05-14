@@ -132,3 +132,6 @@ class DashboardPage(BasePage):
         if c.count() > 0 and c.first.is_visible():
             return c.first
      return None
+    
+    def get_table_row_count(self):
+        return self.page.locator(loc.TABLE_ROWS).count()

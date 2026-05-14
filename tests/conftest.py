@@ -13,7 +13,6 @@ from pages.login_page import LoginPage
 from pages.dashboard_page import DashboardPage
 from pages.model_landing_page import ModelLandingPage
 from pages.processing_dashboard_page import ProcessingDashboardPage
-from pages.create_model_page import CreateModelPage
 from locators import dashboard_locators as dloc
 
 DEFAULT_MODEL_NAME = os.getenv("MODEL_NAME", "TAAS")
@@ -151,8 +150,3 @@ def processing_dashboard_page(processing_page):
     return ProcessingDashboardPage(processing_page)
 
 
-@pytest.fixture
-def create_model_page(page, dashboard_page):
-    if not dashboard_page.is_create_model_button_visible():
-        pytest.skip("Create Model feature not available")
-    cmp = CreateModel

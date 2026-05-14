@@ -20,3 +20,5 @@ def test_processing_dashboard_basic_validations(processing_dashboard_page):
     # Pagination
     assert processing_dashboard_page.is_pagination_visible(), \
         "Pagination not visible"
+    
+    

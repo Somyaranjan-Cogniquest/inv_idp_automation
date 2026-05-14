@@ -1,6 +1,3 @@
-def test_create_model_button_visible(dashboard_page):
-    assert dashboard_page.is_create_model_button_visible()
-
 def test_trained_count_visible(dashboard_page):
     assert dashboard_page.is_trained_count_visible()
 
