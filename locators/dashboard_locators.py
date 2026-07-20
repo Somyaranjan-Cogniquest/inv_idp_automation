@@ -42,3 +42,9 @@ ACTION_MENU_ICON = "img[src*='menu-horizontal']"
 
 # sorting headers (click by text)
 HEADER_BY_TEXT = "th:has-text('{col}')"
+
+MODEL_TABLE_HEADER = "tr:has(th:has-text('Model Name'))"
+MODEL_NAME_CELL = "td.Datarow12v5"
+TABLE_ROWS = "tr:has(td.Datarow12v5)"
+
+BREADCRUMB_CONTAINER = "nav[aria-label='breadcrumb']"

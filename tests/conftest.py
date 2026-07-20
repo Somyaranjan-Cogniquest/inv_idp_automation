@@ -15,6 +15,9 @@ from pages.model_landing_page import ModelLandingPage
 from pages.processing_dashboard_page import ProcessingDashboardPage
 from locators import dashboard_locators as dloc
 
+from pages.model_landing_page import ModelLandingPage
+from pages.training_page import TrainingPage
+
 DEFAULT_MODEL_NAME = os.getenv("MODEL_NAME", "TAAS")
 
 
@@ -148,5 +151,20 @@ def processing_page(page):
 def processing_dashboard_page(processing_page):
 
     return ProcessingDashboardPage(processing_page)
+
+pytest.fixture
+def training_page(page):
+    # ✅ Step 1: We are on Dashboard after login
+    dashboard = DashboardPage(page)
+ 
+    # ✅ Step 2: Click the model (same as processing tests)
+    dashboard.open_model_by_name("TAAS")
+ 
+    # ✅ Step 3: Now we are on Model Landing Page
+    model_landing = ModelLandingPage(page)
+    model_landing.open_training()
+ 
+    # ✅ Step 4: Training page is guaranteed
+    return TrainingPage(page)
 
 

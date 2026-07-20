@@ -2,6 +2,7 @@ from core.base_page import BasePage
 from locators import model_landing_locators as loc
 
 
+
 class ModelLandingPage(BasePage):
 
     def validate_breadcrumb(self, model_name):
@@ -47,3 +48,9 @@ class ModelLandingPage(BasePage):
     def open_processing_dashboard(self):
 
         self.click(loc.PROCESSING_DASHBOARD_CARD)
+
+    def open_training(self):
+        self.click(loc.TRAINING_CARD)
+    
+
+        

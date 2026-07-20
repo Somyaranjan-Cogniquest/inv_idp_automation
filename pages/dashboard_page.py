@@ -135,3 +135,9 @@ class DashboardPage(BasePage):
     
     def get_table_row_count(self):
         return self.page.locator(loc.TABLE_ROWS).count()
+    
+
+    def open_model_by_name(self, model_name: str):
+        self.page.locator(f"td:has-text('{model_name}')").first.click()
+
+        

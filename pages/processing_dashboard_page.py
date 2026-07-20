@@ -59,7 +59,8 @@ class ProcessingDashboardPage(BasePage):
         
     
     def get_table_row_count(self):
-        return self.page.locator(loc.TABLE_ROWS).count()   
+        self.page.wait_for_selector("tbody tr.tablerow", timeout=20000)
+        return self.page.locator("tbody tr.tablerow").count()  
 
     def clear_filters(self):
         self.page.locator(loc.CLEAR_FILTERS_BTN).first.click()
